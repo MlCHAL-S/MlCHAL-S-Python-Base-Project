@@ -4,3 +4,4 @@ Flask-SQLAlchemy
 Flask-Migrate
 pytest
 python-dotenv
+werkzeug
