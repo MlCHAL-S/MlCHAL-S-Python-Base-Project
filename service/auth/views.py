@@ -1,10 +1,14 @@
-from . import app, db
-from service.models import User
-from flask import request, jsonify, render_template, session, flash, redirect, url_for
+# service/auth/views.py
+
+from flask import Blueprint, request, render_template, session, flash, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
+from service.models import User
+from service.extensions import db
+
+auth_bp = Blueprint('auth', __name__)
 
 
-@app.route('/register', methods=('POST', 'GET'))
+@auth_bp.route('/register', methods=('POST', 'GET'))
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -24,15 +28,15 @@ def register():
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-            flash('Registration successful! You can now log in.', 'success')  # Success message
-            return redirect(url_for('login'))
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('auth.login'))
 
-        flash(error, 'danger')  # Error message
+        flash(error, 'danger')
 
     return render_template('auth/register.html')
 
 
-@app.route('/login', methods=('POST', 'GET'))
+@auth_bp.route('/login', methods=('POST', 'GET'))
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -48,16 +52,16 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.id
-            flash('Login successful!', 'success')  # Success message
-            return redirect(url_for('index'))
+            flash('Login successful!', 'success')
+            return redirect(url_for('posts.index'))
 
-        flash(error, 'danger')  # Error message
+        flash(error, 'danger')
 
     return render_template('auth/login.html')
 
 
-@app.route('/logout')
+@auth_bp.route('/logout')
 def logout():
     session.clear()
-    flash('Logged out successfully.', 'success')  # Success message
-    return redirect(url_for('index'))
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('posts.index'))
