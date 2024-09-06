@@ -24,10 +24,10 @@ def register():
             new_user = User(username=username, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
-
+            flash('Registration successful! You can now log in.', 'success')  # Success message
             return redirect(url_for('login'))
 
-        flash(error)
+        flash(error, 'danger')  # Error message
 
     return render_template('auth/register.html')
 
@@ -39,7 +39,6 @@ def login():
         password = request.form['password']
         error = None
         user = User.query.filter_by(username=username).first()
-        print(user)
 
         if user is None:
             error = 'Incorrect username'
@@ -49,9 +48,10 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user.id
+            flash('Login successful!', 'success')  # Success message
             return redirect(url_for('index'))
 
-        flash(error)
+        flash(error, 'danger')  # Error message
 
     return render_template('auth/login.html')
 
@@ -59,4 +59,5 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
+    flash('Logged out successfully.', 'success')  # Success message
     return redirect(url_for('index'))
